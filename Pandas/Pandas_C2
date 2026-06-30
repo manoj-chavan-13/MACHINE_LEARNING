@@ -1,0 +1,2489 @@
+# 📘 Pandas Handbook for Machine Learning
+
+# Chapter 2 — Series (Complete Guide)
+
+---
+
+# 2.1 What is a Series?
+
+A **Series** is the simplest data structure in Pandas.
+
+It is a **one-dimensional labeled array** capable of storing almost any type of data.
+
+Think of it as **one column of an Excel sheet**.
+
+Example:
+
+| Index | Name  |
+| ----: | ----- |
+|     0 | Rahul |
+|     1 | Amit  |
+|     2 | Priya |
+|     3 | Neha  |
+
+This entire column is a **Series**.
+
+---
+
+## Definition
+
+> A Series consists of **two parts**:
+
+* Values
+* Index (Labels)
+
+Example
+
+```python
+import pandas as pd
+
+students = pd.Series(["Rahul","Amit","Priya","Neha"])
+
+print(students)
+```
+
+Output
+
+```
+0    Rahul
+1     Amit
+2    Priya
+3     Neha
+dtype: object
+```
+
+Notice something.
+
+```
+0
+1
+2
+3
+```
+
+These are called the **Index**.
+
+```
+Rahul
+Amit
+Priya
+Neha
+```
+
+These are the **Values**.
+
+---
+
+# Internal Structure
+
+Every Series has three important components.
+
+```
+Series
+
+│
+
+├── Index
+
+├── Values
+
+└── Data Type (dtype)
+```
+
+Example
+
+```
+Index
+
+0
+
+1
+
+2
+
+3
+
+
+Values
+
+10
+
+20
+
+30
+
+40
+
+
+dtype
+
+int64
+```
+
+---
+
+# Why does Series exist?
+
+Suppose you only want to work with the **Age** column.
+
+```
+Name    Age
+
+Rahul   23
+
+Amit    28
+
+Neha    30
+```
+
+Instead of loading the entire table,
+
+Pandas allows you to work only with
+
+```
+Age
+
+23
+
+28
+
+30
+```
+
+This is a Series.
+
+---
+
+# Think Like Excel
+
+Excel
+
+| Age |
+| --- |
+| 20  |
+| 25  |
+| 30  |
+
+↓
+
+Pandas
+
+```python
+Age = pd.Series([20,25,30])
+```
+
+Exactly the same concept.
+
+---
+
+# 2.2 Creating a Series
+
+There are many ways.
+
+---
+
+## Method 1 — Using a List ⭐
+
+Most common.
+
+```python
+import pandas as pd
+
+s = pd.Series([10,20,30,40])
+
+print(s)
+```
+
+Output
+
+```
+0    10
+1    20
+2    30
+3    40
+
+dtype:int64
+```
+
+---
+
+What happened internally?
+
+```
+Python List
+
+↓
+
+[10,20,30,40]
+
+↓
+
+Pandas converts it into
+
+
+Index
+
+0
+
+1
+
+2
+
+3
+
+
+Values
+
+10
+
+20
+
+30
+
+40
+```
+
+Notice:
+
+You never created the index.
+
+Pandas created it automatically.
+
+---
+
+## Method 2 — Custom Index
+
+Sometimes
+
+0
+
+1
+
+2
+
+3
+
+are meaningless.
+
+Suppose these are employee IDs.
+
+```python
+s = pd.Series(
+
+[50000,60000,70000],
+
+index=["EMP101","EMP102","EMP103"]
+
+)
+
+print(s)
+```
+
+Output
+
+```
+EMP101    50000
+
+EMP102    60000
+
+EMP103    70000
+
+dtype:int64
+```
+
+Now,
+
+instead of
+
+```
+0
+
+1
+
+2
+```
+
+we have
+
+```
+EMP101
+
+EMP102
+
+EMP103
+```
+
+---
+
+Why is this useful?
+
+Imagine
+
+Employee Salary
+
+```
+EMP101
+
+EMP102
+
+EMP103
+```
+
+Instead of remembering
+
+Employee number 0,
+
+Employee number 1,
+
+Employee number 2,
+
+you directly use employee IDs.
+
+Much more readable.
+
+---
+
+## Method 3 — Dictionary ⭐⭐⭐
+
+Very common.
+
+```python
+salary = {
+
+"Rahul":50000,
+
+"Amit":65000,
+
+"Neha":70000
+
+}
+
+s = pd.Series(salary)
+
+print(s)
+```
+
+Output
+
+```
+Rahul    50000
+
+Amit     65000
+
+Neha     70000
+
+dtype:int64
+```
+
+Question:
+
+Where did the index come from?
+
+Answer:
+
+Dictionary Keys become the Index.
+
+Dictionary Values become the Values.
+
+Visualization
+
+```
+Dictionary
+
+{
+
+Rahul : 50000,
+
+Amit : 65000
+
+}
+
+
+↓
+
+Series
+
+
+Rahul 50000
+
+Amit 65000
+```
+
+---
+
+## Method 4 — Scalar Value
+
+You can create a Series with a single value.
+
+```python
+s = pd.Series(
+
+100,
+
+index=[1,2,3,4]
+
+)
+
+print(s)
+```
+
+Output
+
+```
+1    100
+
+2    100
+
+3    100
+
+4    100
+```
+
+Pandas repeats the value.
+
+---
+
+Useful when initializing a column with a default value.
+
+---
+
+## Method 5 — NumPy Array ⭐⭐⭐
+
+Since Pandas is built on NumPy,
+
+NumPy arrays can be directly converted.
+
+```python
+import numpy as np
+
+arr = np.array([1,2,3,4])
+
+s = pd.Series(arr)
+
+print(s)
+```
+
+---
+
+# 2.3 Understanding the Index
+
+The Index is **not** just numbering.
+
+It is an object.
+
+Example
+
+```python
+s = pd.Series(
+
+[10,20,30],
+
+index=["A","B","C"]
+
+)
+```
+
+```
+A    10
+
+B    20
+
+C    30
+```
+
+Index
+
+```
+A
+
+B
+
+C
+```
+
+Values
+
+```
+10
+
+20
+
+30
+```
+
+---
+
+Why is Index important?
+
+Because Pandas aligns data using the index.
+
+We'll see this later when performing arithmetic.
+
+---
+
+# 2.4 Accessing Values
+
+There are two ways.
+
+---
+
+### By Position
+
+```python
+s = pd.Series([100,200,300])
+
+print(s[0])
+```
+
+Output
+
+```
+100
+```
+
+---
+
+### By Label
+
+```python
+s = pd.Series(
+
+[100,200,300],
+
+index=["A","B","C"]
+
+)
+
+print(s["A"])
+```
+
+Output
+
+```
+100
+```
+
+---
+
+Comparison
+
+```
+Position
+
+0
+
+1
+
+2
+
+
+Label
+
+A
+
+B
+
+C
+```
+
+---
+
+# 2.5 Slicing a Series
+
+Just like Python lists.
+
+```python
+s = pd.Series([10,20,30,40,50])
+
+print(s[1:4])
+```
+
+Output
+
+```
+1    20
+
+2    30
+
+3    40
+```
+
+---
+
+Using labels
+
+```python
+s = pd.Series(
+
+[10,20,30,40],
+
+index=["A","B","C","D"]
+
+)
+
+print(s["A":"C"])
+```
+
+Output
+
+```
+A 10
+
+B 20
+
+C 30
+```
+
+⚠️ Notice something important:
+
+When slicing by **labels**, the **ending label is included**.
+
+With integer position slicing (`s[1:4]`), the stop position is excluded.
+
+This is a common interview question.
+
+---
+
+# 2.6 Series Attributes
+
+Attributes provide information about a Series.
+
+### `index`
+
+```python
+s.index
+```
+
+Returns
+
+```
+Index(['A','B','C'],dtype='object')
+```
+
+---
+
+### `values`
+
+```python
+s.values
+```
+
+Returns
+
+```
+array([10,20,30])
+```
+
+This is a NumPy array.
+
+---
+
+### `dtype`
+
+```python
+s.dtype
+```
+
+Output
+
+```
+int64
+```
+
+---
+
+### `shape`
+
+```python
+s.shape
+```
+
+Output
+
+```
+(3,)
+```
+
+Meaning
+
+3 rows
+
+1 dimension
+
+---
+
+### `size`
+
+```python
+s.size
+```
+
+Output
+
+```
+3
+```
+
+---
+
+### `ndim`
+
+```python
+s.ndim
+```
+
+Output
+
+```
+1
+```
+
+Because a Series is one-dimensional.
+
+---
+
+### `name`
+
+You can give a Series a name.
+
+```python
+s = pd.Series(
+
+[10,20,30],
+
+name="Age"
+
+)
+
+print(s)
+```
+
+Output
+
+```
+0    10
+
+1    20
+
+2    30
+
+Name: Age
+
+dtype:int64
+```
+
+This is useful when converting a Series into a DataFrame or when exporting data.
+
+---
+
+# 2.7 Data Types (`dtype`)
+
+A Series stores elements of a particular data type.
+
+Examples:
+
+```python
+pd.Series([1, 2, 3])        # int64
+pd.Series([1.5, 2.7])       # float64
+pd.Series([True, False])    # bool
+pd.Series(["A", "B"])       # object (or string dtype if specified)
+```
+
+You can also specify the type explicitly:
+
+```python
+s = pd.Series([1, 2, 3], dtype="float64")
+```
+
+Output:
+
+```
+0    1.0
+1    2.0
+2    3.0
+dtype: float64
+```
+
+---
+
+# 2.8 Vectorized Operations
+
+## What is Vectorization?
+
+Before understanding Pandas, you must understand **vectorization**.
+
+**Vectorization** means performing an operation on an entire collection of values **at once**, instead of processing one value at a time with a loop.
+
+Consider this list:
+
+```
+Age
+
+20
+
+25
+
+30
+
+35
+```
+
+Suppose we want to add **5 years** to everyone's age.
+
+---
+
+## Using Python Lists
+
+```python
+age = [20,25,30,35]
+
+new_age = []
+
+for i in age:
+    new_age.append(i + 5)
+
+print(new_age)
+```
+
+Output
+
+```
+[25, 30, 35, 40]
+```
+
+This works, but notice that Python processes each element individually.
+
+```
+20 → 25
+
+25 → 30
+
+30 → 35
+
+35 → 40
+```
+
+For millions of rows, this becomes slower.
+
+---
+
+## Using Pandas
+
+```python
+import pandas as pd
+
+age = pd.Series([20,25,30,35])
+
+new_age = age + 5
+
+print(new_age)
+```
+
+Output
+
+```
+0    25
+1    30
+2    35
+3    40
+dtype: int64
+```
+
+No loop.
+
+No `append()`.
+
+One line.
+
+---
+
+## How does Pandas do this?
+
+Internally,
+
+Pandas delegates many numerical operations to **NumPy**, which performs operations on entire arrays efficiently.
+
+Conceptually:
+
+```
+Series
+
+20
+
+25
+
+30
+
+35
+
++
+
+5
+
+↓
+
+25
+
+30
+
+35
+
+40
+```
+
+Instead of you writing a loop, Pandas applies the operation across the whole Series.
+
+---
+
+## Why is Vectorization Important?
+
+Imagine
+
+```
+10 values
+```
+
+No difference.
+
+Imagine
+
+```
+10 million values
+```
+
+Vectorized operations are typically **much faster** and produce cleaner, more readable code.
+
+---
+
+# Mathematical Operations
+
+Every arithmetic operator works.
+
+---
+
+## Addition
+
+```python
+s = pd.Series([10,20,30])
+
+print(s + 5)
+```
+
+Output
+
+```
+0    15
+1    25
+2    35
+dtype: int64
+```
+
+---
+
+## Subtraction
+
+```python
+print(s - 5)
+```
+
+Output
+
+```
+5
+
+15
+
+25
+```
+
+---
+
+## Multiplication
+
+```python
+print(s * 2)
+```
+
+Output
+
+```
+20
+
+40
+
+60
+```
+
+---
+
+## Division
+
+```python
+print(s / 2)
+```
+
+Output
+
+```
+5.0
+
+10.0
+
+15.0
+```
+
+Notice the output becomes floating-point because division returns floats.
+
+---
+
+## Power
+
+```python
+print(s ** 2)
+```
+
+Output
+
+```
+100
+
+400
+
+900
+```
+
+---
+
+# Operations Between Two Series
+
+Now something amazing happens.
+
+Consider
+
+```python
+math = pd.Series([90,80,70])
+
+science = pd.Series([85,75,95])
+```
+
+Addition
+
+```python
+math + science
+```
+
+Output
+
+```
+0    175
+
+1    155
+
+2    165
+```
+
+Simple.
+
+But Pandas does **not** simply add based on position in all cases.
+
+It uses the **Index**.
+
+---
+
+# 2.9 Automatic Index Alignment ⭐⭐⭐⭐⭐
+
+This is one of Pandas' defining features.
+
+Consider
+
+```python
+math = pd.Series(
+
+[90,80,70],
+
+index=["Rahul","Amit","Neha"]
+
+)
+
+science = pd.Series(
+
+[85,95,88],
+
+index=["Rahul","Neha","Amit"]
+
+)
+```
+
+Notice
+
+The order is different.
+
+```
+Math
+
+Rahul
+
+Amit
+
+Neha
+
+
+Science
+
+Rahul
+
+Neha
+
+Amit
+```
+
+Now
+
+```python
+math + science
+```
+
+Output
+
+```
+Rahul    175
+
+Amit     168
+
+Neha     165
+```
+
+Wait...
+
+Why?
+
+Because Pandas ignored the position.
+
+It matched using the **labels**.
+
+Visualization
+
+```
+Rahul → Rahul
+
+Amit → Amit
+
+Neha → Neha
+```
+
+Not
+
+```
+1st → 1st
+
+2nd → 2nd
+```
+
+This is called **index alignment**.
+
+It makes Pandas much safer for working with labeled data.
+
+---
+
+# Why is Index Alignment Useful?
+
+Imagine employee salaries.
+
+```
+Rahul
+
+Amit
+
+Neha
+```
+
+If another dataset lists the employees in a different order,
+
+Pandas still combines the correct records based on names (or IDs), reducing the chance of mixing up data.
+
+---
+
+# Missing Labels
+
+Suppose
+
+```python
+A = pd.Series(
+
+[10,20],
+
+index=["A","B"]
+
+)
+
+B = pd.Series(
+
+[100,200],
+
+index=["B","C"]
+
+)
+```
+
+Addition
+
+```python
+A + B
+```
+
+Output
+
+```
+A      NaN
+
+B    120.0
+
+C      NaN
+```
+
+Why?
+
+```
+A
+
+Only exists in first Series
+
+
+C
+
+Only exists in second Series
+```
+
+No matching partner exists, so Pandas returns **NaN** (Not a Number) for those labels.
+
+---
+
+# Using `fill_value`
+
+You can provide a default value for missing labels.
+
+```python
+A.add(B, fill_value=0)
+```
+
+Output
+
+```
+A     10
+
+B    120
+
+C    200
+```
+
+This is often useful when combining datasets with partially overlapping indexes.
+
+---
+
+# Comparison Operations
+
+Comparison operators also work element-wise.
+
+---
+
+## Greater Than
+
+```python
+s = pd.Series([10,20,30,40])
+
+print(s > 20)
+```
+
+Output
+
+```
+0    False
+
+1    False
+
+2     True
+
+3     True
+dtype: bool
+```
+
+Notice
+
+The result is another **Series**, but its data type is **boolean**.
+
+---
+
+## Less Than
+
+```python
+s < 25
+```
+
+Output
+
+```
+True
+
+True
+
+False
+
+False
+```
+
+---
+
+## Equal To
+
+```python
+s == 20
+```
+
+Output
+
+```
+False
+
+True
+
+False
+
+False
+```
+
+---
+
+# Boolean Indexing ⭐⭐⭐⭐⭐
+
+This is one of the most frequently used techniques in data cleaning.
+
+Suppose
+
+```python
+salary = pd.Series(
+
+[25000,40000,80000,100000]
+
+)
+```
+
+Find salaries greater than ₹50,000.
+
+```python
+salary[salary > 50000]
+```
+
+Output
+
+```
+2     80000
+
+3    100000
+```
+
+What happened?
+
+Step 1
+
+```python
+salary > 50000
+```
+
+Produces
+
+```
+False
+
+False
+
+True
+
+True
+```
+
+Step 2
+
+Pandas keeps only the rows where the condition is `True`.
+
+Visualization
+
+```
+25000
+
+False
+
+↓
+
+Removed
+
+40000
+
+False
+
+↓
+
+Removed
+
+80000
+
+True
+
+↓
+
+Kept
+
+100000
+
+True
+
+↓
+
+Kept
+```
+
+This is the foundation of filtering data in Pandas.
+
+---
+
+# Multiple Conditions
+
+Suppose
+
+```python
+salary = pd.Series(
+
+[25000,40000,80000,100000]
+)
+```
+
+Employees earning between ₹30,000 and ₹90,000:
+
+```python
+salary[(salary > 30000) & (salary < 90000)]
+```
+
+Output
+
+```
+1    40000
+
+2    80000
+```
+
+Use:
+
+* `&` for AND
+* `|` for OR
+* `~` for NOT
+
+Remember to wrap each condition in parentheses because `&` and `|` have different operator precedence than comparison operators.
+
+---
+
+# Common Mistake
+
+❌ Wrong
+
+```python
+salary > 30000 and salary < 90000
+```
+
+This raises an error because `and` works with single Boolean values, not entire Series.
+
+✅ Correct
+
+```python
+(salary > 30000) & (salary < 90000)
+```
+
+---
+
+# 2.10 What are Missing Values?
+
+In real-world datasets, data is rarely complete.
+
+Example:
+
+| Student | Age |
+| ------- | --- |
+| Rahul   | 20  |
+| Amit    | 22  |
+| Neha    | ?   |
+| Priya   | 21  |
+
+Here,
+
+Neha's age is unknown.
+
+This unknown value is called a **Missing Value**.
+
+---
+
+## Why do Missing Values Occur?
+
+There are many reasons:
+
+### 1. Human Error
+
+Someone forgot to enter the data.
+
+Example
+
+```
+Name      Salary
+
+Rahul     50000
+
+Amit
+
+Priya     60000
+```
+
+Salary is missing.
+
+---
+
+### 2. Device Failure
+
+Imagine a temperature sensor.
+
+```
+10 AM → 25°C
+
+11 AM → 26°C
+
+12 PM → Sensor Failed
+
+1 PM → 27°C
+```
+
+Temperature at 12 PM is missing.
+
+---
+
+### 3. Data Corruption
+
+While transferring files,
+
+some values may be lost.
+
+---
+
+### 4. Survey Questions
+
+A customer skips a question.
+
+```
+Age ?
+
+Salary ?
+
+Gender ✓
+```
+
+Missing values appear.
+
+---
+
+# Why are Missing Values Dangerous?
+
+Machine Learning algorithms usually **expect complete numerical data**.
+
+Consider
+
+```
+Age
+
+20
+
+25
+
+NaN
+
+30
+```
+
+Can we calculate the average?
+
+Not directly.
+
+Many ML algorithms cannot train until missing values are handled.
+
+---
+
+# How Does Pandas Represent Missing Data?
+
+Pandas mainly uses three representations:
+
+### 1. NaN ⭐⭐⭐⭐⭐
+
+Most common.
+
+NaN stands for
+
+> **Not a Number**
+
+Example
+
+```python
+import pandas as pd
+import numpy as np
+
+s = pd.Series([10,20,np.nan,40])
+
+print(s)
+```
+
+Output
+
+```
+0    10.0
+
+1    20.0
+
+2     NaN
+
+3    40.0
+
+dtype: float64
+```
+
+---
+
+Notice something interesting.
+
+Original values
+
+```
+10
+
+20
+
+40
+```
+
+are integers.
+
+Yet,
+
+dtype became
+
+```
+float64
+```
+
+Why?
+
+Because the traditional `NaN` value is a floating-point special value, so Pandas stores the Series as floating-point in this example.
+
+---
+
+# 2. None
+
+Python has
+
+```python
+None
+```
+
+Example
+
+```python
+s = pd.Series([10,None,30])
+
+print(s)
+```
+
+Output
+
+```
+0    10.0
+
+1     NaN
+
+2    30.0
+
+dtype: float64
+```
+
+Notice
+
+Pandas automatically converts `None` to `NaN` in many numeric Series.
+
+---
+
+# 3. pd.NA
+
+Introduced in newer versions of Pandas.
+
+```python
+import pandas as pd
+
+s = pd.Series(
+
+[10,pd.NA,30],
+
+dtype="Int64"
+
+)
+```
+
+This is the newer, nullable missing-value indicator that works with Pandas' nullable dtypes.
+
+We'll study nullable dtypes in more detail later.
+
+---
+
+# Visual Representation
+
+```
+Series
+
+↓
+
+10
+
+20
+
+NaN
+
+40
+```
+
+Internally
+
+```
+10
+
+20
+
+Missing
+
+40
+```
+
+---
+
+# 2.11 Detecting Missing Values
+
+Suppose
+
+```python
+import numpy as np
+
+s = pd.Series(
+
+[10,np.nan,30,np.nan]
+
+)
+```
+
+---
+
+## isna()
+
+Syntax
+
+```python
+Series.isna()
+```
+
+Example
+
+```python
+print(s.isna())
+```
+
+Output
+
+```
+0    False
+
+1     True
+
+2    False
+
+3     True
+
+dtype: bool
+```
+
+Explanation
+
+```
+10
+
+↓
+
+False
+
+NaN
+
+↓
+
+True
+
+30
+
+↓
+
+False
+
+NaN
+
+↓
+
+True
+```
+
+True means
+
+Missing value found.
+
+---
+
+## isnull()
+
+```python
+s.isnull()
+```
+
+It is an alias for `isna()`.
+
+Both produce the same result.
+
+---
+
+Interview Question ⭐
+
+Difference between
+
+```
+isna()
+
+isnull()
+```
+
+Answer
+
+There is **no functional difference** in Pandas. `isnull()` is simply another name (alias) for `isna()`.
+
+---
+
+# Finding Non-Missing Values
+
+Use
+
+```python
+s.notna()
+```
+
+Output
+
+```
+True
+
+False
+
+True
+
+False
+```
+
+---
+
+Or
+
+```python
+s.notnull()
+```
+
+Again,
+
+same result.
+
+---
+
+# Counting Missing Values
+
+Suppose
+
+```python
+s = pd.Series(
+
+[10,np.nan,30,np.nan,50]
+
+)
+```
+
+Find total missing values.
+
+```python
+s.isna().sum()
+```
+
+Output
+
+```
+2
+```
+
+Why?
+
+Step 1
+
+```
+False
+
+True
+
+False
+
+True
+
+False
+```
+
+Step 2
+
+Python treats
+
+```
+True = 1
+
+False = 0
+```
+
+Sum
+
+```
+0+1+0+1+0
+
+=
+
+2
+```
+
+Very clever.
+
+---
+
+# Percentage of Missing Values
+
+Often used in Machine Learning.
+
+```python
+missing_percentage = (s.isna().sum()/len(s))*100
+
+print(missing_percentage)
+```
+
+Suppose
+
+```
+2 missing
+
+5 total
+```
+
+Output
+
+```
+40%
+```
+
+Many data scientists compute this metric before deciding how to handle missing data.
+
+---
+
+# 2.12 Removing Missing Values
+
+Use
+
+```python
+dropna()
+```
+
+Example
+
+```python
+s = pd.Series(
+
+[10,20,np.nan,40]
+
+)
+
+print(s.dropna())
+```
+
+Output
+
+```
+0    10
+
+1    20
+
+3    40
+```
+
+Notice
+
+Index
+
+```
+0
+
+1
+
+3
+```
+
+Why not
+
+```
+0
+
+1
+
+2
+```
+
+Because `dropna()` removes values but **does not automatically reset the index**.
+
+---
+
+Reset the index if desired:
+
+```python
+clean = s.dropna().reset_index(drop=True)
+
+print(clean)
+```
+
+Output
+
+```
+0    10
+
+1    20
+
+2    40
+```
+
+---
+
+# 2.13 Filling Missing Values
+
+Instead of removing rows,
+
+we can replace missing values.
+
+This is called **imputation**.
+
+---
+
+## Fill with Constant
+
+```python
+s.fillna(0)
+```
+
+Output
+
+```
+10
+
+20
+
+0
+
+40
+```
+
+---
+
+## Fill with Any Value
+
+```python
+s.fillna(100)
+```
+
+Output
+
+```
+10
+
+20
+
+100
+
+40
+```
+
+---
+
+# Why Fill Instead of Drop?
+
+Suppose
+
+```
+10 million rows
+```
+
+If
+
+```
+2 million
+```
+
+contain missing values,
+
+dropping them may remove valuable information.
+
+Sometimes filling is a better strategy.
+
+---
+
+# 2.14 Forward Fill (`ffill()`)
+
+Imagine temperature readings:
+
+```
+25
+
+26
+
+NaN
+
+27
+```
+
+We can assume the missing value is similar to the previous one.
+
+```python
+s.ffill()
+```
+
+Output
+
+```
+25
+
+26
+
+26
+
+27
+```
+
+Visualization
+
+```
+Previous Value
+
+↓
+
+Copied Down
+```
+
+---
+
+# 2.15 Backward Fill (`bfill()`)
+
+Instead of copying the previous value,
+
+copy the next available value.
+
+```python
+s.bfill()
+```
+
+Output
+
+```
+25
+
+26
+
+27
+
+27
+```
+
+Visualization
+
+```
+Next Value
+
+↓
+
+Copied Up
+```
+
+---
+
+# When Should You Use Each Method?
+
+| Method           | Best Use Case                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| `fillna(0)`      | When zero is a meaningful value (e.g., quantity sold)                                 |
+| `fillna(mean)`   | Numerical features with roughly symmetric distributions                               |
+| `fillna(median)` | Numerical features with outliers or skewed data                                       |
+| `fillna(mode)`   | Categorical features                                                                  |
+| `ffill()`        | Time-series or sequential observations                                                |
+| `bfill()`        | Sequential data where the next observation is a reasonable estimate                   |
+| `dropna()`       | When only a small number of rows are missing and removing them won't bias the dataset |
+
+---
+
+# Mean Imputation
+
+Suppose
+
+```
+20
+
+25
+
+NaN
+
+30
+
+35
+```
+
+Mean
+
+```
+(20+25+30+35)/4
+
+=
+
+27.5
+```
+
+```python
+s.fillna(s.mean())
+```
+
+Output
+
+```
+20
+
+25
+
+27.5
+
+30
+
+35
+```
+
+---
+
+# Median Imputation
+
+Suppose
+
+```
+20
+
+25
+
+NaN
+
+30
+
+1000
+```
+
+Mean
+
+```
+269
+```
+
+Not good because **1000** is an outlier.
+
+Median
+
+```
+27.5
+```
+
+Better.
+
+```python
+s.fillna(s.median())
+```
+
+In skewed distributions, the median is often a better choice.
+
+---
+
+# Mode Imputation
+
+Suppose
+
+```
+Red
+
+Blue
+
+Red
+
+NaN
+
+Green
+```
+
+Most frequent value
+
+```
+Red
+```
+
+```python
+s.fillna(s.mode()[0])
+```
+
+Output
+
+```
+Red
+
+Blue
+
+Red
+
+Red
+
+Green
+```
+
+---
+
+# Common Mistakes
+
+### ❌ Filling every column with `0`
+
+Not appropriate for all data.
+
+Example:
+
+```
+Age
+
+NaN
+```
+
+Age is not necessarily 0.
+
+---
+
+### ❌ Dropping all missing rows
+
+You may lose a significant portion of your dataset.
+
+---
+
+### ❌ Ignoring missing values
+
+Many ML algorithms will fail or produce unreliable results.
+
+---
+
+# Interview Questions
+
+### Q1
+
+What is the difference between
+
+```
+NaN
+
+None
+
+pd.NA
+```
+
+**Answer**
+
+* `NaN` is the traditional floating-point missing value.
+* `None` is Python's null object and is often converted by Pandas in numeric contexts.
+* `pd.NA` is Pandas' newer missing-value indicator designed for nullable data types.
+
+---
+
+### Q2
+
+Difference between
+
+```
+isna()
+
+notna()
+```
+
+**Answer**
+
+* `isna()` identifies missing values.
+* `notna()` identifies non-missing values.
+
+---
+
+### Q3
+
+When should you use
+
+```
+Mean
+
+Median
+
+Mode
+```
+
+**Answer**
+
+* **Mean**: Numeric data without strong outliers.
+* **Median**: Numeric data with skewness or outliers.
+* **Mode**: Categorical or discrete variables.
+
+---
+
+# Practice Exercises
+
+### Exercise 1
+
+Create
+
+```python
+s = pd.Series([10,20,None,40,None])
+```
+
+* Count missing values.
+* Count non-missing values.
+* Calculate the percentage of missing values.
+
+---
+
+### Exercise 2
+
+Replace missing values with:
+
+* 0
+* Mean
+* Median
+
+Compare the outputs.
+
+---
+
+### Exercise 3
+
+Use `dropna()` and then reset the index.
+
+---
+
