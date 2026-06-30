@@ -1,0 +1,1014 @@
+# 📘 Pandas for Machine Learning
+
+# Module 11 — Statistics & Exploratory Data Analysis (EDA)
+
+---
+
+# 🎯 Learning Objectives
+
+After completing this module, you will be able to:
+
+* Perform statistical analysis on data
+* Understand distributions
+* Detect outliers
+* Measure spread
+* Find relationships between variables
+* Explore categorical features
+* Prepare data for Machine Learning
+
+---
+
+# Sample Dataset
+
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    "Age": [22, 25, 21, 24, 28],
+    "Salary": [50000, 65000, 55000, 70000, 60000],
+    "Department": ["IT", "HR", "IT", "Sales", "HR"]
+})
+
+print(df)
+```
+
+| Age | Salary | Department |
+| --- | ------ | ---------- |
+| 22  | 50000  | IT         |
+| 25  | 65000  | HR         |
+| 21  | 55000  | IT         |
+| 24  | 70000  | Sales      |
+| 28  | 60000  | HR         |
+
+---
+
+# What is EDA?
+
+EDA means
+
+> **Exploring data before modeling.**
+
+Typical workflow
+
+```text
+Read Dataset
+      ↓
+Inspect Data
+      ↓
+Statistics
+      ↓
+Find Missing Values
+      ↓
+Find Outliers
+      ↓
+Find Relationships
+      ↓
+Machine Learning
+```
+
+---
+
+# 11.1 count() ⭐⭐⭐⭐⭐
+
+Returns the number of **non-missing values**.
+
+```python
+df["Age"].count()
+```
+
+Output
+
+```text
+5
+```
+
+Suppose
+
+```text
+22
+
+25
+
+NaN
+
+24
+```
+
+Output
+
+```text
+3
+```
+
+because missing values are ignored.
+
+---
+
+# count() vs len()
+
+Suppose
+
+```text
+22
+
+25
+
+NaN
+
+24
+```
+
+```python
+len(df["Age"])
+```
+
+returns
+
+```text
+4
+```
+
+because every row is counted.
+
+```python
+df["Age"].count()
+```
+
+returns
+
+```text
+3
+```
+
+because only non-null values are counted.
+
+---
+
+# 11.2 sum()
+
+```python
+df["Salary"].sum()
+```
+
+Calculation
+
+```text
+50000
+
++
+
+65000
+
++
+
+55000
+
++
+
+70000
+
++
+
+60000
+
+=
+
+300000
+```
+
+Output
+
+```text
+300000
+```
+
+---
+
+# 11.3 mean() ⭐⭐⭐⭐⭐
+
+Average value.
+
+```python
+df["Salary"].mean()
+```
+
+Calculation
+
+```text
+300000 / 5
+```
+
+Output
+
+```text
+60000
+```
+
+---
+
+### ML Use
+
+Fill missing numerical values.
+
+```python
+df["Salary"].fillna(
+    df["Salary"].mean()
+)
+```
+
+---
+
+### Limitation
+
+Sensitive to outliers.
+
+Example
+
+```text
+20
+
+22
+
+25
+
+1000
+```
+
+Mean becomes
+
+```text
+266.75
+```
+
+which is misleading.
+
+---
+
+# 11.4 median() ⭐⭐⭐⭐⭐
+
+Middle value after sorting.
+
+Example
+
+```text
+20
+
+25
+
+30
+
+35
+
+40
+```
+
+Median
+
+```text
+30
+```
+
+Even number of values
+
+```text
+20
+
+30
+
+40
+
+50
+```
+
+Median
+
+```text
+35
+```
+
+---
+
+### Why Median?
+
+Suppose
+
+```text
+20
+
+21
+
+22
+
+1000
+```
+
+Mean
+
+```text
+265.75
+```
+
+Median
+
+```text
+21.5
+```
+
+Median better represents skewed data.
+
+---
+
+# 11.5 mode()
+
+Most frequently occurring value.
+
+Example
+
+```text
+IT
+
+HR
+
+IT
+
+Sales
+
+IT
+```
+
+```python
+df["Department"].mode()
+```
+
+Output
+
+```text
+IT
+```
+
+Remember
+
+`mode()` always returns a **Series** because there can be multiple modes.
+
+---
+
+# 11.6 min()
+
+Smallest value.
+
+```python
+df["Salary"].min()
+```
+
+Output
+
+```text
+50000
+```
+
+---
+
+# 11.7 max()
+
+Largest value.
+
+```python
+df["Salary"].max()
+```
+
+Output
+
+```text
+70000
+```
+
+---
+
+# 11.8 idxmin()
+
+Returns the **index** of the minimum value.
+
+```python
+df["Salary"].idxmin()
+```
+
+Output
+
+```text
+0
+```
+
+---
+
+# 11.9 idxmax()
+
+Returns the **index** of the maximum value.
+
+```python
+df["Salary"].idxmax()
+```
+
+Output
+
+```text
+3
+```
+
+---
+
+### Interview Question
+
+Difference?
+
+```python
+max()
+```
+
+↓
+
+Returns value
+
+```python
+idxmax()
+```
+
+↓
+
+Returns index
+
+---
+
+# 11.10 std() ⭐⭐⭐⭐⭐
+
+Standard deviation measures
+
+> **How spread out the data is.**
+
+Example
+
+```text
+20
+
+21
+
+22
+
+21
+
+20
+```
+
+Very close together.
+
+↓
+
+Small standard deviation.
+
+Example
+
+```text
+20
+
+100
+
+50
+
+200
+
+10
+```
+
+Very spread out.
+
+↓
+
+Large standard deviation.
+
+```python
+df["Salary"].std()
+```
+
+---
+
+### ML Importance
+
+Features with very different scales often require scaling before training.
+
+---
+
+# 11.11 var()
+
+Variance
+
+```text
+Variance
+
+=
+
+(Standard Deviation)²
+```
+
+```python
+df["Salary"].var()
+```
+
+---
+
+# 11.12 quantile()
+
+Returns percentiles.
+
+25%
+
+```python
+df["Salary"].quantile(0.25)
+```
+
+50%
+
+```python
+df["Salary"].quantile(0.50)
+```
+
+Same as
+
+```python
+median()
+```
+
+75%
+
+```python
+df["Salary"].quantile(0.75)
+```
+
+---
+
+### Why Important?
+
+Used for
+
+* IQR
+* Outlier detection
+* Boxplots
+
+---
+
+# 11.13 describe() ⭐⭐⭐⭐⭐
+
+Most commonly used summary.
+
+```python
+df.describe()
+```
+
+Output
+
+| Statistic | Meaning            |
+| --------- | ------------------ |
+| count     | Non-null values    |
+| mean      | Average            |
+| std       | Standard deviation |
+| min       | Minimum            |
+| 25%       | First Quartile     |
+| 50%       | Median             |
+| 75%       | Third Quartile     |
+| max       | Maximum            |
+
+---
+
+Categorical summary
+
+```python
+df.describe(include="object")
+```
+
+Returns
+
+* count
+* unique
+* top
+* freq
+
+---
+
+# 11.14 unique()
+
+Returns distinct values.
+
+```python
+df["Department"].unique()
+```
+
+Output
+
+```text
+IT
+
+HR
+
+Sales
+```
+
+---
+
+# 11.15 nunique()
+
+Returns number of unique values.
+
+```python
+df["Department"].nunique()
+```
+
+Output
+
+```text
+3
+```
+
+---
+
+### Difference
+
+```text
+unique()
+
+↓
+
+Values
+
+nunique()
+
+↓
+
+Count
+```
+
+---
+
+# 11.16 value_counts() ⭐⭐⭐⭐⭐
+
+Counts frequency.
+
+```python
+df["Department"].value_counts()
+```
+
+Output
+
+```text
+IT       2
+
+HR       2
+
+Sales    1
+```
+
+---
+
+Percentages
+
+```python
+df["Department"].value_counts(
+    normalize=True
+)
+```
+
+Output
+
+```text
+IT      0.40
+
+HR      0.40
+
+Sales   0.20
+```
+
+---
+
+### ML Use
+
+Useful for checking whether a classification target is balanced.
+
+Example
+
+```text
+Purchased
+
+Yes
+
+Yes
+
+Yes
+
+No
+```
+
+Shows class imbalance.
+
+---
+
+# 11.17 corr() ⭐⭐⭐⭐⭐
+
+Correlation measures the strength of the relationship between numerical variables.
+
+```python
+df.corr(numeric_only=True)
+```
+
+Example Output
+
+|        |  Age | Salary |
+| ------ | ---: | -----: |
+| Age    | 1.00 |   0.82 |
+| Salary | 0.82 |   1.00 |
+
+---
+
+## Correlation Range
+
+| Value | Meaning                      |
+| ----- | ---------------------------- |
+| 1     | Perfect positive correlation |
+| 0     | No linear relationship       |
+| -1    | Perfect negative correlation |
+
+---
+
+### Example
+
+Positive correlation
+
+```text
+Age ↑
+
+Salary ↑
+```
+
+Negative correlation
+
+```text
+Temperature ↑
+
+Heater Usage ↓
+```
+
+---
+
+### Why Important?
+
+Highly correlated features may carry similar information, which can matter in some ML models.
+
+---
+
+# 11.18 cov()
+
+Covariance measures how two variables change together.
+
+```python
+df.cov(numeric_only=True)
+```
+
+Unlike correlation,
+
+covariance is **not standardized**.
+
+In practice,
+
+most ML workflows use
+
+```python
+corr()
+```
+
+more frequently than
+
+```python
+cov()
+```
+
+---
+
+# Detecting Outliers Using IQR
+
+Suppose
+
+Salary
+
+```text
+50000
+
+55000
+
+60000
+
+65000
+
+500000
+```
+
+Clearly
+
+```text
+500000
+```
+
+is an outlier.
+
+---
+
+Step 1
+
+```python
+Q1 = df["Salary"].quantile(0.25)
+
+Q3 = df["Salary"].quantile(0.75)
+```
+
+---
+
+Step 2
+
+```python
+IQR = Q3 - Q1
+```
+
+---
+
+Step 3
+
+Lower Bound
+
+```python
+lower = Q1 - 1.5 * IQR
+```
+
+Upper Bound
+
+```python
+upper = Q3 + 1.5 * IQR
+```
+
+---
+
+Step 4
+
+```python
+outliers = df[
+    (df["Salary"] < lower) |
+    (df["Salary"] > upper)
+]
+```
+
+Very common in EDA.
+
+---
+
+# Typical EDA Workflow
+
+```python
+df.describe()
+
+df.info()
+
+df.isna().sum()
+
+df["Department"].value_counts()
+
+df.corr(numeric_only=True)
+
+df["Salary"].quantile([0.25,0.5,0.75])
+```
+
+This gives a solid understanding of most datasets.
+
+---
+
+# Best Practices ⭐⭐⭐⭐⭐
+
+✔ Always run
+
+```python
+df.describe()
+```
+
+---
+
+✔ Check missing values.
+
+---
+
+✔ Examine class distribution.
+
+---
+
+✔ Look for outliers.
+
+---
+
+✔ Check correlations before feature selection.
+
+---
+
+# Common Mistakes
+
+### ❌ Using mean on skewed data
+
+Prefer
+
+```python
+median()
+```
+
+when outliers are present.
+
+---
+
+### ❌ Confusing
+
+```python
+max()
+```
+
+and
+
+```python
+idxmax()
+```
+
+---
+
+### ❌ Confusing
+
+```python
+unique()
+```
+
+and
+
+```python
+nunique()
+```
+
+---
+
+### ❌ Assuming high correlation implies causation
+
+Correlation indicates association, **not** cause-and-effect.
+
+---
+
+# Interview Questions
+
+### 1. Difference between mean and median?
+
+* Mean is the arithmetic average.
+* Median is the middle value after sorting and is more robust to outliers.
+
+---
+
+### 2. Difference between `count()` and `len()`?
+
+* `count()` ignores missing values.
+* `len()` counts every row.
+
+---
+
+### 3. Difference between `unique()` and `nunique()`?
+
+* `unique()` returns the distinct values.
+* `nunique()` returns the number of distinct values.
+
+---
+
+### 4. Why use `value_counts()` in ML?
+
+To inspect the distribution of categorical variables or target classes.
+
+---
+
+### 5. Difference between correlation and covariance?
+
+* Correlation is standardized and ranges from -1 to 1.
+* Covariance depends on the units of the variables and has no fixed range.
+
+---
+
+# Practice Exercises
+
+Using the sample DataFrame:
+
+1. Calculate the mean salary.
+2. Calculate the median age.
+3. Find the mode of the Department column.
+4. Find the minimum and maximum salary.
+5. Find the index of the highest salary.
+6. Calculate the standard deviation of salary.
+7. Calculate the variance of age.
+8. Find the 25th, 50th, and 75th salary percentiles.
+9. Display the statistical summary using `describe()`.
+10. Find unique departments and their counts.
+11. Compute the correlation matrix.
+12. Detect salary outliers using the IQR method.
+
+---
